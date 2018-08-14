@@ -4,23 +4,23 @@ const { graphql, buildSchema } = require('graphql');
 
 const schema = buildSchema(`
 type Query {
-  foo: String
+  Person: String
 }
 
-type Schema {
-  query: Query
+type Person {
+  name: String
 }
 `);
-
-const resolvers = {
-  foo: () => 'bar',
-};
 
 const query = `
 query myFirstQuery {
   foo
 }
 `;
+
+const resolvers = {
+  foo: () => 'bar',
+};
 
 graphql(schema, query, resolvers)
   .then((result) => console.log(result))
