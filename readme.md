@@ -6,7 +6,6 @@
 ## Why
 this app is a toy for playing with GQL. Goals:
 
-* build a server that returns fake employee data GQL style
 * query against said server with a client, esp a popular client like apollo
 * demonstrate GQL tooling like the built in endpoint schema documentation
 
