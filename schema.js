@@ -149,8 +149,8 @@ const Query = new GraphQLObjectType({
   },
 });
 
-const TimesheetEntryInput = new GraphQLInputObjectType({
-  name: 'TimesheetEntryInput',
+const TimesheetEntryCreateInput = new GraphQLInputObjectType({
+  name: 'TimesheetEntryCreateInput',
   fields: {
     timesheetId: { type: new GraphQLNonNull(GraphQLID) },
     taskId: { type: new GraphQLNonNull(GraphQLID) },
@@ -176,7 +176,7 @@ const Mutation = new GraphQLObjectType({
     createTimesheetEntry: {
       type: TimesheetEntryType,
       args: {
-        input: { type: new GraphQLNonNull(TimesheetEntryInput) },
+        input: { type: new GraphQLNonNull(TimesheetEntryCreateInput) },
       },
       resolve: (_, { input }) => {
         const nextId = String(
