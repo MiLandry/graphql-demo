@@ -4,6 +4,7 @@ const {
   GraphQLString,
   GraphQLList,
   GraphQLObjectType,
+  GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLSchema,
   GraphQLScalarType,
@@ -148,22 +149,29 @@ const Query = new GraphQLObjectType({
   },
 });
 
+const TimesheetEntryInput = new GraphQLInputObjectType({
+  name: 'TimesheetEntryInput',
+  fields: {
+    timesheetId: { type: new GraphQLNonNull(GraphQLID) },
+    taskId: { type: new GraphQLNonNull(GraphQLID) },
+    hours: { type: new GraphQLNonNull(GraphQLInt) },
+    note: { type: GraphQLString },
+  },
+});
+
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     createTimesheetEntry: {
       type: TimesheetEntryType,
       args: {
-        timesheetId: { type: new GraphQLNonNull(GraphQLID) },
-        taskId: { type: new GraphQLNonNull(GraphQLID) },
-        hours: { type: new GraphQLNonNull(GraphQLInt) },
-        note: { type: GraphQLString },
+        input: { type: new GraphQLNonNull(TimesheetEntryInput) },
       },
-      resolve: (_, { timesheetId, taskId, hours, note }) => {
+      resolve: (_, { input }) => {
         const nextId = String(
           data.timesheetEntries.reduce((maxId, entry) => Math.max(maxId, Number(entry.id)), 0) + 1
         );
-        const entry = { id: nextId, timesheetId, taskId, hours, note };
+        const entry = { id: nextId, ...input };
         data.timesheetEntries.push(entry);
         return entry;
       },
