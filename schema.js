@@ -34,8 +34,11 @@ const data = {
   ],
   timesheetEntries: [
     { id: '1', timesheetId: '1', taskId: '1', hours: 4, note: 'Landing page mockups' },
-    { id: '2', timesheetId: '2', taskId: '2', hours: 5, note: 'GraphQL schema and resolver design' },
-    { id: '3', timesheetId: '3', taskId: '2', hours: 6, note: 'API implementation for timesheets' },
+    { id: '2', timesheetId: '1', taskId: '2', hours: 3, note: 'API integration review' },
+    { id: '3', timesheetId: '2', taskId: '2', hours: 5, note: 'GraphQL schema and resolver design' },
+    { id: '4', timesheetId: '2', taskId: '1', hours: 2, note: 'Design system updates' },
+    { id: '5', timesheetId: '3', taskId: '2', hours: 6, note: 'API implementation for timesheets' },
+    { id: '6', timesheetId: '3', taskId: '1', hours: 2, note: 'UI mockup refinements' },
   ],
 };
 
@@ -109,9 +112,23 @@ const Query = new GraphQLObjectType({
       type: new GraphQLList(WorkerType),
       resolve: () => data.workers,
     },
+    worker: {
+      type: WorkerType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: (_, { id }) => data.workers.find((worker) => worker.id === id),
+    },
     tasks: {
       type: new GraphQLList(TaskType),
       resolve: () => data.tasks,
+    },
+    task: {
+      type: TaskType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLID) },
+      },
+      resolve: (_, { id }) => data.tasks.find((task) => task.id === id),
     },
     timesheets: {
       type: new GraphQLList(TimesheetType),
