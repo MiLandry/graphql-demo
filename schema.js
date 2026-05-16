@@ -6,7 +6,17 @@ const {
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLSchema,
+  GraphQLScalarType,
 } = require('graphql');
+
+// Custom Date scalar
+const DateType = new GraphQLScalarType({
+  name: 'Date',
+  description: 'Date custom scalar type',
+  serialize: (value) => value instanceof Date ? value.toISOString() : value,
+  parseValue: (value) => new Date(value),
+  parseLiteral: (ast) => new Date(ast.value),
+});
 
 const data = {
   workers: [
@@ -18,9 +28,14 @@ const data = {
     { id: '2', title: 'Development', description: 'Backend and API implementation', hourlyRate: 150 },
   ],
   timesheets: [
-    { id: '1', workerId: '1', jobItemId: '1', date: '2026-05-01', hours: 4, note: 'Landing page mockups' },
-    { id: '2', workerId: '1', jobItemId: '2', date: '2026-05-02', hours: 5, note: 'GraphQL schema and resolver design' },
-    { id: '3', workerId: '2', jobItemId: '2', date: '2026-05-01', hours: 6, note: 'API implementation for timesheets' },
+    { id: '1', workerId: '1', startingDate: new Date('2026-05-01'), endingDate: new Date('2026-05-05'), dateSubmitted: new Date('2026-05-06') },
+    { id: '2', workerId: '1', startingDate: new Date('2026-05-08'), endingDate: new Date('2026-05-12'), dateSubmitted: new Date('2026-05-13') },
+    { id: '3', workerId: '2', startingDate: new Date('2026-05-01'), endingDate: new Date('2026-05-05'), dateSubmitted: new Date('2026-05-06') },
+  ],
+  timesheetEntries: [
+    { id: '1', timesheetId: '1', jobItemId: '1', hours: 4, note: 'Landing page mockups' },
+    { id: '2', timesheetId: '2', jobItemId: '2', hours: 5, note: 'GraphQL schema and resolver design' },
+    { id: '3', timesheetId: '3', jobItemId: '2', hours: 6, note: 'API implementation for timesheets' },
   ],
 };
 
@@ -45,10 +60,27 @@ const JobItemType = new GraphQLObjectType({
     title: { type: GraphQLString },
     description: { type: GraphQLString },
     hourlyRate: { type: GraphQLInt },
-    timesheets: {
-      type: new GraphQLList(TimesheetType),
-      resolve: (jobItem) => data.timesheets.filter((ts) => ts.jobItemId === jobItem.id),
+    entries: {
+      type: new GraphQLList(TimesheetEntryType),
+      resolve: (jobItem) => data.timesheetEntries.filter((entry) => entry.jobItemId === jobItem.id),
     },
+  }),
+});
+
+const TimesheetEntryType = new GraphQLObjectType({
+  name: 'TimesheetEntry',
+  fields: () => ({
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    timesheet: {
+      type: TimesheetType,
+      resolve: (entry) => data.timesheets.find((ts) => ts.id === entry.timesheetId),
+    },
+    jobItem: {
+      type: JobItemType,
+      resolve: (entry) => data.jobItems.find((jobItem) => jobItem.id === entry.jobItemId),
+    },
+    hours: { type: GraphQLInt },
+    note: { type: GraphQLString },
   }),
 });
 
@@ -60,13 +92,13 @@ const TimesheetType = new GraphQLObjectType({
       type: WorkerType,
       resolve: (timesheet) => data.workers.find((worker) => worker.id === timesheet.workerId),
     },
-    jobItem: {
-      type: JobItemType,
-      resolve: (timesheet) => data.jobItems.find((jobItem) => jobItem.id === timesheet.jobItemId),
+    startingDate: { type: DateType },
+    endingDate: { type: DateType },
+    dateSubmitted: { type: DateType },
+    entries: {
+      type: new GraphQLList(TimesheetEntryType),
+      resolve: (timesheet) => data.timesheetEntries.filter((entry) => entry.timesheetId === timesheet.id),
     },
-    date: { type: GraphQLString },
-    hours: { type: GraphQLInt },
-    note: { type: GraphQLString },
   }),
 });
 
@@ -84,6 +116,10 @@ const Query = new GraphQLObjectType({
     timesheets: {
       type: new GraphQLList(TimesheetType),
       resolve: () => data.timesheets,
+    },
+    timesheetEntries: {
+      type: new GraphQLList(TimesheetEntryType),
+      resolve: () => data.timesheetEntries,
     },
     timesheetsByWorker: {
       type: new GraphQLList(TimesheetType),
