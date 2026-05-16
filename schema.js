@@ -23,7 +23,7 @@ const data = {
     { id: '1', firstName: 'Alice', lastName: 'Jones', email: 'alice@example.com' },
     { id: '2', firstName: 'Bob', lastName: 'Smith', email: 'bob@example.com' },
   ],
-  jobItems: [
+  tasks: [
     { id: '1', title: 'Design', description: 'UI design work', hourlyRate: 120 },
     { id: '2', title: 'Development', description: 'Backend and API implementation', hourlyRate: 150 },
   ],
@@ -33,9 +33,9 @@ const data = {
     { id: '3', workerId: '2', startingDate: new Date('2026-05-01'), endingDate: new Date('2026-05-05'), dateSubmitted: new Date('2026-05-06') },
   ],
   timesheetEntries: [
-    { id: '1', timesheetId: '1', jobItemId: '1', hours: 4, note: 'Landing page mockups' },
-    { id: '2', timesheetId: '2', jobItemId: '2', hours: 5, note: 'GraphQL schema and resolver design' },
-    { id: '3', timesheetId: '3', jobItemId: '2', hours: 6, note: 'API implementation for timesheets' },
+    { id: '1', timesheetId: '1', taskId: '1', hours: 4, note: 'Landing page mockups' },
+    { id: '2', timesheetId: '2', taskId: '2', hours: 5, note: 'GraphQL schema and resolver design' },
+    { id: '3', timesheetId: '3', taskId: '2', hours: 6, note: 'API implementation for timesheets' },
   ],
 };
 
@@ -53,8 +53,8 @@ const WorkerType = new GraphQLObjectType({
   }),
 });
 
-const JobItemType = new GraphQLObjectType({
-  name: 'JobItem',
+const TaskType = new GraphQLObjectType({
+  name: 'Task',
   fields: () => ({
     id: { type: new GraphQLNonNull(GraphQLID) },
     title: { type: GraphQLString },
@@ -62,7 +62,7 @@ const JobItemType = new GraphQLObjectType({
     hourlyRate: { type: GraphQLInt },
     entries: {
       type: new GraphQLList(TimesheetEntryType),
-      resolve: (jobItem) => data.timesheetEntries.filter((entry) => entry.jobItemId === jobItem.id),
+      resolve: (task) => data.timesheetEntries.filter((entry) => entry.taskId === task.id),
     },
   }),
 });
@@ -75,9 +75,9 @@ const TimesheetEntryType = new GraphQLObjectType({
       type: TimesheetType,
       resolve: (entry) => data.timesheets.find((ts) => ts.id === entry.timesheetId),
     },
-    jobItem: {
-      type: JobItemType,
-      resolve: (entry) => data.jobItems.find((jobItem) => jobItem.id === entry.jobItemId),
+    task: {
+      type: TaskType,
+      resolve: (entry) => data.tasks.find((task) => task.id === entry.taskId),
     },
     hours: { type: GraphQLInt },
     note: { type: GraphQLString },
@@ -109,9 +109,9 @@ const Query = new GraphQLObjectType({
       type: new GraphQLList(WorkerType),
       resolve: () => data.workers,
     },
-    jobItems: {
-      type: new GraphQLList(JobItemType),
-      resolve: () => data.jobItems,
+    tasks: {
+      type: new GraphQLList(TaskType),
+      resolve: () => data.tasks,
     },
     timesheets: {
       type: new GraphQLList(TimesheetType),
