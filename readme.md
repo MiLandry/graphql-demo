@@ -1,16 +1,16 @@
 # graphql demo
 
-`npm i`
-`node server.js`
+`yarn install`
+`yarn start`
 
 ## Why
-this app is a toy for playing with GQL. Goals:
+this app is a toy for playing with GraphQL. Goals:
 
-* query against said server with a client, esp a popular client like apollo
-* demonstrate GQL tooling like the built in endpoint schema documentation
+* query against a timesheet API with a client, especially a popular client like Apollo
+* demonstrate GraphQL schema tooling and the GraphQL playground
 
 ## Info
-uses GraphQL.js. Docs live here: https://graphql.org/graphql-js/
+uses GraphQL.js and Apollo Server. Docs live here: https://graphql.org/graphql-js/
 
 ## notes
  GraphQL.js supports two different ways to build schemas, programatically, or with SDL.
