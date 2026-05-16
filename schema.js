@@ -159,6 +159,17 @@ const TimesheetEntryInput = new GraphQLInputObjectType({
   },
 });
 
+const TimesheetEntryUpdateInput = new GraphQLInputObjectType({
+  name: 'TimesheetEntryUpdateInput',
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    timesheetId: { type: GraphQLID },
+    taskId: { type: GraphQLID },
+    hours: { type: GraphQLInt },
+    note: { type: GraphQLString },
+  },
+});
+
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -173,6 +184,23 @@ const Mutation = new GraphQLObjectType({
         );
         const entry = { id: nextId, ...input };
         data.timesheetEntries.push(entry);
+        return entry;
+      },
+    },
+    updateTimesheetEntry: {
+      type: TimesheetEntryType,
+      args: {
+        input: { type: new GraphQLNonNull(TimesheetEntryUpdateInput) },
+      },
+      resolve: (_, { input }) => {
+        const entry = data.timesheetEntries.find((item) => item.id === input.id);
+        if (!entry) {
+          return null;
+        }
+        if (input.timesheetId !== undefined) entry.timesheetId = input.timesheetId;
+        if (input.taskId !== undefined) entry.taskId = input.taskId;
+        if (input.hours !== undefined) entry.hours = input.hours;
+        if (input.note !== undefined) entry.note = input.note;
         return entry;
       },
     },
