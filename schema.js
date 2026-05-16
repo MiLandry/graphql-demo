@@ -34,15 +34,6 @@ const Employee = new GraphQLObjectType({
   }
 });
 
-// TODO create enum of job titles and nest
-// const BookmarkOrderByType = new GraphQLEnumType({
-//   name: 'OrderBy',
-//   values: {
-//       MOST_LIKES: {value: "MOST_LIKES"},
-//       LAST_CREATED: {value: "LAST_CREATED"},
-//       MOST_USED: {value: "MOST_USED"}
-//   }
-// });
 
 
 const Query = new GraphQLObjectType({
